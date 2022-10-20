@@ -1,8 +1,10 @@
 package tp1;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
-
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -20,7 +22,7 @@ public class Main {
                 "Parte 1", "Parte 2- 3 caracteres", "Parte 2- 5 caracteres", "Parte 2- 7 Caracteres", "Terminar"
             };
             int option =
-                JOptionPane.showOptionDialog(null, "Que hacemo?", "Elegir", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.showOptionDialog(null, "Escoge una opción", "Elegir", JOptionPane.DEFAULT_OPTION,
                                              JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             HashMap<String, String> codificacionSF;
             HashMap<String,Integer> descendingMap;
@@ -113,13 +115,24 @@ public class Main {
                     matriz[1][2] = arreglo[7] / (arreglo[6] + arreglo[7] + arreglo[8]);
                     matriz[2][2] = arreglo[8] / (arreglo[6] + arreglo[7] + arreglo[8]);
 
+                    FileWriter writer = new FileWriter("matrizDePasajes.txt");
+                    BufferedWriter bf = new BufferedWriter(writer);  
+                    
+                    
                     System.out.println("Matriz...");
                     for (int i = 0; i < 3; i++) { //no nula!!!
                         for (int j = 0; j < 3; j++) {
-                            System.out.print("[" + matriz[i][j] + "]"); //"Matriz["+ i+"]["+j+"] ="
+                        	bf.write("[" + matriz[i][j] + "]  ");
+                            System.out.print("[" + matriz[i][j] + "]  "); //"Matriz["+ i+"]["+j+"] ="
                         }
+                        bf.write("\n");
                         System.out.println("");
                     }
+                    
+                    bf.close();
+                    
+                    
+
 
                     double[] vectorEstacionario = { (double) 1 / 3, (double) 1 / 3, (double) 1 / 3 };
                     double[] vectorAux = { 0, 0, 0 };
@@ -136,27 +149,34 @@ public class Main {
                         for (int p = 0; p < 3; p++)
                             vectorEstacionario[p] = vectorAux[p];
                     }
+                    
+                    writer = new FileWriter("VectorEstacionario.txt");
+                    bf = new BufferedWriter(writer);
 
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < 3; i++) {
+                    	bf.write("V[" + i + "]:" +vectorEstacionario[i]+"   ");
                         System.out.println("V[" + i + "]: " +
                                            vectorEstacionario[i]); //existe el vector estacionario y es independiente de las condiciones iniciales. -> sí es ergódica.
-
+                    }
+                    bf.close();
 
                     double entropia = 0;
 
                     for (int j = 0; j < 3; j++) {
                         for (int i = 0; i < 3; i++) {
-                            entropia +=
-                                vectorEstacionario[j] * matriz[i][j] *
-                                (Math.log((1 / matriz[i][j]) /
-                                          Math.log(2))); //multiplicar por logaritmo en base 2 de 1/matriz[i][j]
+                        	entropia += vectorEstacionario[j] * matriz[i][j] * (Math.log((1 / matriz[i][j])) /Math.log(2));
                         }
                     }
-                    //0.47 0.57 0.393 =1.43
+                    
+                    writer = new FileWriter("entropiaParteUno.txt");
+                    bf = new BufferedWriter(writer);
+                    
+                    bf.write("Entropia= "+ entropia + "bits/símbolo");
+                    bf.close();
+
                     System.out.println("Entropia: " + entropia);
                     break;
                 case 1:
-                    System.out.println("case 1");
 
                     HashMap<String, Integer> mapa1 = Calculos.generaMapa(lector, 1);
                     lector.close();
@@ -166,22 +186,39 @@ public class Main {
                     lectorCod = new BufferedReader(arch);
 
                     descendingMap = Calculos.orderMap(mapa1);
-                    codificacionSF = Calculos.ShanonFano(descendingMap);
-                    Calculos.crearCodificacion(codificacionSF, lectorCod, 1);
+                    
                     System.out.println(Arrays.asList(mapa1)); //printea el hashmap con el elemento agregado y la cantidad de veces que aparece
                     System.out.println("Cantidad de informacion: " + Calculos.info(mapa1));
                     System.out.println("Entropia: " + Calculos.Entropia(mapa1));
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa1));
-                    System.out.println("Kraft: " + Calculos.Kraft(mapa1));
-                    System.out.println(Arrays.asList(Calculos.orderMap(mapa1)));
-                    System.out.println("Codificacion Shannon-Fano"+Arrays.asList(codificacionSF));
-                    arch.close();
-                    lectorCod.close();
-                    if (Calculos.Kraft(mapa1) <= 1)
+                    System.out.println("Kraft: " + Calculos.Kraft(mapa1, option));
+                    if (Calculos.Kraft(mapa1, option) <= 1)
                         System.out.println("Cumple con Kraft");
                     else
                         System.out.println("No cumple Kraft");
+                    if (Calculos.longitudMedia(mapa1) > Calculos.Entropia(mapa1)) {
+                        System.out.println("RENDIMIENTO: " + Calculos.Rendimiento(mapa1));
+                        System.out.println("REDUNDANCIA: " + Calculos.Redundancia(mapa1));
+                    }
+                    codificacionSF = Calculos.ShanonFano(descendingMap);
+                    Calculos.crearCodificacion(codificacionSF, lectorCod, 1);
+                    System.out.println(Arrays.asList(Calculos.orderMap(mapa1)));
+                    System.out.println("Codificacion Shannon-Fano" + Arrays.asList(codificacionSF));
+                    arch.close();
+                    lectorCod.close();
+                    
+                    FileWriter myWriter = new FileWriter("Datos3.txt");
+                    BufferedWriter buffer = new BufferedWriter(myWriter);  
+                    buffer.write("Entropia: "+ Calculos.Entropia(mapa1) + "\n Cantidad de información: "+ Calculos.info(mapa1) + "\n Longitud media: "+ Calculos.longitudMedia(mapa1) );
+                    buffer.write("\nKraft: "+ Calculos.Kraft(mapa1, option));
+                    
+                    if (Calculos.longitudMedia(mapa1) > Calculos.Entropia(mapa1)) {
+                    	buffer.write("\nRendimiento: "+ Calculos.Rendimiento(mapa1)+ "\n Redundancia: "+ Calculos.Redundancia(mapa1));
+                    }
+                    buffer.close();
+                    
                     break;
+                    
                 case 2:
 
                     HashMap<String, Integer> mapa2 = Calculos.generaMapa(lector, 2);
@@ -194,6 +231,7 @@ public class Main {
 
                     descendingMap = Calculos.orderMap(mapa2);
                     codificacionSF = Calculos.ShanonFano(descendingMap);
+                    System.out.println(Arrays.asList(codificacionSF));
                     Calculos.crearCodificacion(codificacionSF, lectorCod, 2);
                     System.out.println(Arrays.asList(mapa2));
                     System.out.println("Cantidad de informacion: " + Calculos.info(mapa2));
@@ -201,16 +239,32 @@ public class Main {
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa2));
                     System.out.println(Arrays.asList(descendingMap));
                     System.out.println("Codificacion Shannon-Fano"+Arrays.asList(codificacionSF));
-                    System.out.println("Kraft: " + Calculos.Kraft(mapa2));
+                    System.out.println("Kraft: " + Calculos.Kraft(mapa2,option));
                     arch.close();
                     lectorCod.close();
-                    if (Calculos.Kraft(mapa2) <= 1)
+                    if (Calculos.Kraft(mapa2,option) <= 1)
                         System.out.println("Cumple con Kraft");
                     else
                         System.out.println("No cumple Kraft");
+                    if (Calculos.longitudMedia(mapa2) > Calculos.Entropia(mapa2)) {
+                        System.out.println("RENDIMIENTO: " + Calculos.Rendimiento(mapa2));
+                        System.out.println("REDUNDANCIA: " + Calculos.Redundancia(mapa2));
+                    }
+                    
+                    FileWriter myWriter2 = new FileWriter("Datos5.txt");
+                    BufferedWriter buffer2 = new BufferedWriter(myWriter2);  
+                    buffer2.write("Entropia: "+ Calculos.Entropia(mapa2) + "\n Cantidad de información: "+ Calculos.info(mapa2) + "\n Longitud media: "+ Calculos.longitudMedia(mapa2) );
+                    buffer2.write("\nKraft: "+ Calculos.Kraft(mapa2, option));
+                    
+                    if (Calculos.longitudMedia(mapa2) > Calculos.Entropia(mapa2)) {
+                    	buffer2.write("\nRendimiento: "+ Calculos.Rendimiento(mapa2)+ "\n Redundancia: "+ Calculos.Redundancia(mapa2));
+                    }
+                    buffer2.close();
+                    
                     break;
+                    
+                    
                 case 3:
-                    System.out.println("case 3");
 
                     HashMap<String, Integer> mapa3 = Calculos.generaMapa(lector, 3);
                     
@@ -229,25 +283,35 @@ public class Main {
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa3));
                     System.out.println(Arrays.asList(descendingMap));
                     System.out.println("Codificacion Shannon-Fano"+Arrays.asList(codificacionSF));
-                    System.out.println("Kraft: " + Calculos.Kraft(mapa3));
+                    System.out.println("Kraft: " + Calculos.Kraft(mapa3,option));
                     arch.close();
                     lectorCod.close();
-                    if (Calculos.Kraft(mapa3) <=
-                        1) //este cumple con kraft.... pero ver porque quiza los simbolos que no aparecen deberian contar tambien.
+                    if (Calculos.Kraft(mapa3,option) <=
+                        1) 
                         System.out.println("Cumple con Kraft");
                     else
                         System.out.println("No cumple Kraft");
 
                     if (Calculos.longitudMedia(mapa3) > Calculos.Entropia(mapa3)) {
-                        System.out.println("RENDIMIENTO" + Calculos.Rendimiento(mapa3));
-                        System.out.println("REDUNDANCIA" + Calculos.Redundancia(mapa3));
+                        System.out.println("RENDIMIENTO: " + Calculos.Rendimiento(mapa3));
+                        System.out.println("REDUNDANCIA: " + Calculos.Redundancia(mapa3));
                     }
+                    
+                    FileWriter myWriter3 = new FileWriter("Datos7.txt");
+                    BufferedWriter buffer3 = new BufferedWriter(myWriter3);  
+                    buffer3.write("Entropia: "+ Calculos.Entropia(mapa3) + "\n Cantidad de información: "+ Calculos.info(mapa3) + "\n Longitud media: "+ Calculos.longitudMedia(mapa3) );
+                    buffer3.write("\nKraft: "+ Calculos.Kraft(mapa3, option));
+                    
+                    if (Calculos.longitudMedia(mapa3) > Calculos.Entropia(mapa3)) {
+                    	buffer3.write("\nRendimiento: "+ Calculos.Rendimiento(mapa3)+ "\n Redundancia: "+ Calculos.Redundancia(mapa3));
+                    }
+                    buffer3.close();
                     break;
                 }
 
             }
         } catch (Exception e) {
-                System.out.println("Error");
+                System.out.println("Error"+ e.getMessage());
         }
     }
 }
