@@ -1,1 +1,1 @@
-Entropia= 1.4769973604775612bits/símbolo
+Entropia= 0.9318815806718006bits/símbolo
