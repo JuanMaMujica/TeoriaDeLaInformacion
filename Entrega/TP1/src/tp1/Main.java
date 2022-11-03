@@ -1,14 +1,17 @@
-package tp1;
-
 import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
+
 import java.io.FileWriter;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JOptionPane;
+
+import tp1.Calculos;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -164,7 +167,7 @@ public class Main {
 
                     for (int j = 0; j < 3; j++) {
                         for (int i = 0; i < 3; i++) {
-                        	entropia += vectorEstacionario[j] * matriz[i][j] * (Math.log((1 / matriz[i][j])) /Math.log(2));
+                        	entropia += vectorEstacionario[j] * matriz[i][j] * (Math.log((1 / matriz[i][j])) /Math.log(3));
                         }
                     }
                     
@@ -188,7 +191,6 @@ public class Main {
                     descendingMap = Calculos.orderMap(mapa1);
                     
                     System.out.println(Arrays.asList(mapa1)); //printea el hashmap con el elemento agregado y la cantidad de veces que aparece
-                    System.out.println("Cantidad de informacion: " + Calculos.info(mapa1));
                     System.out.println("Entropia: " + Calculos.Entropia(mapa1));
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa1));
                     System.out.println("Kraft: " + Calculos.Kraft(mapa1, option));
@@ -208,8 +210,17 @@ public class Main {
                     lectorCod.close();
                     
                     FileWriter myWriter = new FileWriter("Datos3.txt");
-                    BufferedWriter buffer = new BufferedWriter(myWriter);  
-                    buffer.write("Entropia: "+ Calculos.Entropia(mapa1) + "\n Cantidad de información: "+ Calculos.info(mapa1) + "\n Longitud media: "+ Calculos.longitudMedia(mapa1) );
+                    BufferedWriter buffer = new BufferedWriter(myWriter);
+                    
+                    Calculos.info(mapa1, 3, buffer);
+                    buffer.write("Entropia: "+ Calculos.Entropia(mapa1) + "\n Longitud media: "+ Calculos.longitudMedia(mapa1) );
+                    
+                    if(Calculos.isCompacto(mapa1, 3)){
+                        buffer.write("\nEl código es Compacto");
+                    } else {
+                        buffer.write("\nEl código no es Compacto");
+                    }
+                    
                     buffer.write("\nKraft: "+ Calculos.Kraft(mapa1, option));
                     
                     if (Calculos.longitudMedia(mapa1) > Calculos.Entropia(mapa1)) {
@@ -234,7 +245,6 @@ public class Main {
                     System.out.println(Arrays.asList(codificacionSF));
                     Calculos.crearCodificacion(codificacionSF, lectorCod, 2);
                     System.out.println(Arrays.asList(mapa2));
-                    System.out.println("Cantidad de informacion: " + Calculos.info(mapa2));
                     System.out.println("Entropia: " + Calculos.Entropia(mapa2));
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa2));
                     System.out.println(Arrays.asList(descendingMap));
@@ -253,7 +263,14 @@ public class Main {
                     
                     FileWriter myWriter2 = new FileWriter("Datos5.txt");
                     BufferedWriter buffer2 = new BufferedWriter(myWriter2);  
-                    buffer2.write("Entropia: "+ Calculos.Entropia(mapa2) + "\n Cantidad de información: "+ Calculos.info(mapa2) + "\n Longitud media: "+ Calculos.longitudMedia(mapa2) );
+                    Calculos.info(mapa2, 5, buffer2);
+                    buffer2.write("Entropia: "+ Calculos.Entropia(mapa2) + "\n Longitud media: "+ Calculos.longitudMedia(mapa2) );
+                    if(Calculos.isCompacto(mapa2, 5)){
+                        buffer2.write("\nEl código es Compacto");
+                    } else {
+                        buffer2.write("\nEl código no es Compacto");
+                    }
+                    
                     buffer2.write("\nKraft: "+ Calculos.Kraft(mapa2, option));
                     
                     if (Calculos.longitudMedia(mapa2) > Calculos.Entropia(mapa2)) {
@@ -278,7 +295,6 @@ public class Main {
                     codificacionSF = Calculos.ShanonFano(descendingMap);
                     Calculos.crearCodificacion(codificacionSF, lectorCod, 3);
                     System.out.println(Arrays.asList(mapa3));
-                    System.out.println("Cantidad de informacion: " + Calculos.info(mapa3));
                     System.out.println("Entropia: " + Calculos.Entropia(mapa3));
                     System.out.println("Longitud Media: " + Calculos.longitudMedia(mapa3));
                     System.out.println(Arrays.asList(descendingMap));
@@ -286,20 +302,24 @@ public class Main {
                     System.out.println("Kraft: " + Calculos.Kraft(mapa3,option));
                     arch.close();
                     lectorCod.close();
-                    if (Calculos.Kraft(mapa3,option) <=
-                        1) 
+                    if (Calculos.Kraft(mapa3,option) <= 1) 
                         System.out.println("Cumple con Kraft");
                     else
                         System.out.println("No cumple Kraft");
-
                     if (Calculos.longitudMedia(mapa3) > Calculos.Entropia(mapa3)) {
                         System.out.println("RENDIMIENTO: " + Calculos.Rendimiento(mapa3));
                         System.out.println("REDUNDANCIA: " + Calculos.Redundancia(mapa3));
                     }
                     
                     FileWriter myWriter3 = new FileWriter("Datos7.txt");
-                    BufferedWriter buffer3 = new BufferedWriter(myWriter3);  
-                    buffer3.write("Entropia: "+ Calculos.Entropia(mapa3) + "\n Cantidad de información: "+ Calculos.info(mapa3) + "\n Longitud media: "+ Calculos.longitudMedia(mapa3) );
+                    BufferedWriter buffer3 = new BufferedWriter(myWriter3);
+                    Calculos.info(mapa3, 7, buffer3);
+                    buffer3.write("Entropia: "+ Calculos.Entropia(mapa3) + "\n Longitud media: "+ Calculos.longitudMedia(mapa3) );
+                    if(Calculos.isCompacto(mapa3, 7)){
+                        buffer3.write("\nEl código es Compacto");
+                    } else {
+                        buffer3.write("\nEl código no es Compacto");
+                    }
                     buffer3.write("\nKraft: "+ Calculos.Kraft(mapa3, option));
                     
                     if (Calculos.longitudMedia(mapa3) > Calculos.Entropia(mapa3)) {

@@ -61,20 +61,17 @@ public class Calculos {
             return mapa1;
     }
     
-    public static double info(HashMap<String,Integer> mapa) {
-            Iterator<String> iterador = mapa.keySet().iterator();
-            double aux = 0;
-            double size= 0;
-            
-            //fijarse xq estoy recorriendo el mapa 2 veces xd 
-            for (Integer val : mapa.values()) {
-                    size+=val;
-            }
-            while (iterador.hasNext()) {
-                    String clave = iterador.next();
-                    aux+=Math.log(1/(mapa.get(clave)/size))/Math.log(3);
-            }
-            return aux;             
+    public static void info(HashMap<String,Integer> mapa,  int orden, BufferedWriter buffer) throws IOException {
+        Iterator<String> iterador = mapa.keySet().iterator();
+        double size= 0;
+        for (Integer val : mapa.values()) {
+            size += val;
+        }
+        buffer.write("Cantidad de Informacion: \n");
+        while (iterador.hasNext()) {
+            String clave = iterador.next();
+            buffer.write(clave + "\t"+ Math.log(1/(mapa.get(clave)/size))/Math.log(3)+"\n");
+        }         
     }
     
     public static double Entropia(HashMap<String,Integer> mapa) {
@@ -82,7 +79,6 @@ public class Calculos {
             double aux = 0;
             double size= 0;
             
-            //fijarse xq estoy recorriendo el mapa 2 veces xd 
             for (Integer val : mapa.values()) {
                     size+=val;
             }
@@ -93,7 +89,7 @@ public class Calculos {
             return aux;             
     }
     
-    public static double longitudMedia(HashMap<String,Integer> mapa) {
+    public static int longitudMedia(HashMap<String,Integer> mapa) {
             Iterator<String> iterador = mapa.keySet().iterator();
             double aux = 0;
             double size = 0;
@@ -104,7 +100,7 @@ public class Calculos {
                     String clave = iterador.next();
                     aux+=(mapa.get(clave)/size)*clave.length();
             }
-            return aux;
+            return (int) Math.ceil(aux);
     }
     
     public static double Kraft(HashMap<String,Integer> mapa, int caso) {
@@ -279,11 +275,6 @@ public class Calculos {
         
         Arrays.fill(byte_array, (byte) 0);
         
-         /*   for (String clave:codificacion.keySet()) {
-        String valor = codificacion.get(clave);
-        System.out.println("Clave: " + clave + ", valor: " + valor);
-    }  //generar tabla */
-        
         System.out.println(codShanonFano);
         
         while (i<codShanonFano.length()){
@@ -306,4 +297,27 @@ public class Calculos {
         fout.close();
         fw.close();     
         }
-    }
+    
+        public static boolean isCompacto(HashMap<String,Integer> mapa, int orden) throws IOException {
+            Iterator<String> iterador = mapa.keySet().iterator();
+            double prob=0;
+            double size= 0;
+            boolean flag=true;
+            int cant = (int) Math.pow(3, orden);
+            if(cant==mapa.size()){
+                for (Integer val : mapa.values()) {
+                    size+=val;
+                }
+                while (iterador.hasNext()) {   
+                    String clave = iterador.next();
+                    prob=mapa.get(clave)/size;
+                    if (Math.ceil(Math.log(1/prob)/Math.log(3))!=orden){
+                        flag=false;
+                    } 
+                } 
+            }else {
+                flag = false;
+            }
+            return flag;
+        }
+}
