@@ -25,14 +25,7 @@ public class Escritura {
 			this.f=new File("Auxtp1_grupo8Huffman.Huf");
 			this.f2=new File("Resultadostp1g8.txt");
 		}
-		else if(arch==2) {
-			this.f=new File("AuxiliarChinoHuffman.Huf");
-			this.f2=new File("ResultadosChinoHuffman.txt");
-		}
-		else {
-			this.f=new File("AuxiliarImagenHuffman.Huf");
-			this.f2=new File("ResultadosImagenHuffman.txt");
-		}
+		
 		this.w = new FileWriter(this.f);
 		this.bw= new BufferedWriter(this.w);
 		this.wr= new PrintWriter(this.bw);	

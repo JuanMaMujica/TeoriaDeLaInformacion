@@ -1,11 +1,15 @@
 package prueba;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +23,10 @@ import java.util.List;
 public class Huffman {
 
 	private ArrayList<NodoArbol> auxLongitudes = new ArrayList();
+	private File decodeArchHuffman;
+	private FileWriter w2Decode;
+	private BufferedWriter bw2Decode;
+	private PrintWriter pwDecode;
 
 	/** ACA SE CODIFICA A LOS SIMBOLOS
 	 * @param arbol
@@ -102,6 +110,7 @@ public class Huffman {
 		escribir.agregaResultado("Redundancia del código: " + redundancia);
 	}
 
+	
 	/** ACA SE REALIZA LA CODIFICACION POR HUFFMAN A UN .Huf
 	 * @param listaArbol
 	 * @param arch
@@ -118,15 +127,7 @@ public class Huffman {
 		if (arch == 1) {
 			fr = new FileReader("tp1_grupo8.txt");
 			br = new BufferedReader(fr);
-		} else if (arch == 2) {
-			fr = new FileReader("Chino.txt");
-			br = new BufferedReader(fr);
-		} else {
-			fr = new FileReader("imagen.raw");
-			br = new BufferedReader(fr);
-			br.readLine();
-			br.readLine();
-		}
+		} 
 		
 
 		//ACA COMPRIME LA TABLA
@@ -157,7 +158,6 @@ public class Huffman {
 		while(i<simbolos.size()) {
 			
 			
-			//System.out.println(i);
 			//LA DUDA ES: EL CHAR BACKSTIP Y LA ONDA ME TIRAN VALORES DE ASCII ALTISIMOS PERO EN LA TABLA POSTA NO TIOENEN ESOS VALORES. Es un error?
 			
 			
@@ -234,10 +234,16 @@ public class Huffman {
 			i++;
 		}
 		
-		while ((auxFile = br.read()) != -1) {
-			if (auxFile != 13) { // SE OMITE EL DENOMINADO RETORNO DE CARRO YA QUE NO ES NECESARIO
+		double tamañoArch = this.getTamArchivo(1);
+		int recorrer = 0;
+		while(recorrer < tamañoArch)
+		 {
+			recorrer++;
+			System.out.println(recorrer);
+			auxFile = (br.read() & 0xFF);
+			if (auxFile != 13) { // OMITE RETORNO DE CARRO 
 				if (arch != 3) {
-					if (auxFile != 10) { // hay que asignarle la cadena "enter" ya que en la colección el simbolo esta seteado de esa forma
+					if (auxFile != 10) { 
 						
 						
 						char auxChar = (char) auxFile;
@@ -253,7 +259,7 @@ public class Huffman {
 					//System.out.println();
 					auxNodo.setCodigoBinario("");
 				} else { 
-					if (auxFile != 10) {  // PARA LA IMAGEN SE OMITE LOS ENTER O \N
+					if (auxFile != 10) { 
 						char auxChar = (char) auxFile;
 						auxLetra = String.valueOf(auxChar);
 						this.buscaSimbolo(listaArbol.getArbol(),auxLetra,auxNodo);
@@ -281,7 +287,11 @@ public class Huffman {
 		if (arch == 1) {
 			FileInputStream in = new FileInputStream("Auxtp1_grupo8Huffman.Huf"); //Archivo huf codificado sin comprimir
 			FileOutputStream out = new FileOutputStream("tp1_grupo8Huffman.Huf"); //huf comprimido
-			while((bytes=(byte) in.read())!=-1) {
+			int r = 0;
+			double t = this.getTamArchivo(3);
+			while(r < t) {
+				bytes=(byte) (in.read() & 0xFF);
+				r++;
 				binario+=String.valueOf(bytes-48); // ya que el valor que voy a recibir es o un 1 o un 0, entonces resto por 48 por valor de tabla ASCII
 				if(binario.length()==8) {
 					wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
@@ -293,52 +303,12 @@ public class Huffman {
 			  while(binario.length()<8) {
 				  binario+="0";
 			  }
-			  wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-			out.write(wrByte);//escribo en el archivo
+			  wrByte=this.pasajeByte(binario); 
+			out.write(wrByte);
 			}
 			in.close();
 			out.close();
-		} else if (arch == 2) {
-			FileInputStream in = new FileInputStream("AuxiliarChinoHuffman.Huf");
-			FileOutputStream out = new FileOutputStream("ChinoHuffman.Huf");
-			while((bytes=(byte) in.read())!=-1) {
-				binario+=String.valueOf(bytes-48); // ya que el valor que voy a recibir es o un 1 o un 0, entonces resto por 48 por valor de tabla ASCII
-				if(binario.length()==8) {
-					wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-					binario=""; // reinicio la cadena 
-					out.write(wrByte); //escribo en el archivo
-				}
-			}
-			if(!binario.isEmpty()) { //caso particular, cuando se acaba el archivo, si quedo un string no vacio, y menor a un byte, hay que completar con 0
-			  while(binario.length()<8) {
-				  binario+="0";
-			  }
-			  wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-			out.write(wrByte);//escribo en el archivo
-			}
-			in.close();
-			out.close();
-		} else {
-			FileInputStream in = new FileInputStream("AuxiliarImagenHuffman.Huf");
-			FileOutputStream out = new FileOutputStream("ImagenHuffman.Huf");
-			while((bytes=(byte) in.read())!=-1) {
-				binario+=String.valueOf(bytes-48); // ya que el valor que voy a recibir es o un 1 o un 0, entonces resto por 48 por valor de tabla ASCII
-				if(binario.length()==8) {
-					wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-					binario=""; // reinicio la cadena 
-					out.write(wrByte); //escribo en el archivo
-				}
-			}
-			if(!binario.isEmpty()) { //caso particular, cuando se acaba el archivo, si quedo un string no vacio, y menor a un byte, hay que completar con 0
-			  while(binario.length()<8) {
-				  binario+="0";
-			  }
-			  wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-			out.write(wrByte);//escribo en el archivo
-			}
-			in.close();
-			out.close();
-		}
+		} 
 	}
 	
 	/**TRATAR LA CODIFICACION COMO BYTE EN EL ARCHIVO .FAN
@@ -381,41 +351,28 @@ public class Huffman {
 			ruta = Paths.get("tp1_grupo8.txt");
 
 		} else if (arch == 2) {
-			ruta = Paths.get("Chino.txt");
+			ruta = Paths.get("tp1_grupo8Huffman.Huf");
 		} else {
-			ruta = Paths.get("imagen.raw");
+			ruta = Paths.get("Auxtp1_grupo8Huffman.Huf");
 		}
 		return Files.size(ruta);
 	}
 
 	public double getTamComprimido(int arch) throws IOException {
-		Path ruta;
+		Path ruta = null;
 		if (arch == 1) {
 			ruta = Paths.get("tp1_grupo8Huffman.Huf");
-
-		} else if (arch == 2) {
-			ruta = Paths.get("ChinoHuffman.Huf");
-		} else {
-			ruta = Paths.get("ImagenHuffman.Huf");
-		}
+		} 
 		return Files.size(ruta);
 
 	}
 	
 	
-	/**
-	 * CREA LA TABLA LEYENDO DEL ARCHIVO
+	/** HACE LA DECODIFICACION
 	 * @param arch
 	 * @return retorna el tamano del archivo original
 	 * @throws IOException
 	 */
-	public void createTabla() {
-		
-		
-		
-	}
-
-	
 	public void decodeHuffman(List<Simbolo> simbolosDecode) {
 		
 		FileReader fr = null;
@@ -461,18 +418,16 @@ public class Huffman {
 					
 				simbolosDecode.get(i).setCodigoHuffman(agrego + bMasc);
 			
-				
 				i++;		
-				
 			}
-			
 			//CON LA TABLA YA ARMADA, PASAMOS A DECODIFICAR EL ARCHIVO
 			String cadenaABuscar = "";
-			int recorre = fout.read() & 0xFF;
 
-			bytes=(byte) (fout.read() & 0xFF);
-			while(bytes!=-1) // Recorremos el resto del arch desde donde se quedo parado
+			double tamaño = getTamArchivo(2);
+			this.creaDecode();
+			while(rec <  tamaño) // Recorremos el resto del arch desde donde se quedo parado
 			{
+				bytes=(byte) (fout.read() & 0xFF);
 				rec++;
 				String bMasc =  Integer.toBinaryString(bytes & 0xFF);
 				String a = "";
@@ -481,29 +436,23 @@ public class Huffman {
 					a+="0";
 				}
 				bMasc = a + bMasc;
-				String resultado = null;
-
+				String resultado = null; 
 
 				for(int x=0;x<bMasc.length();x++) //Al ser instantaneos, automaticamente si no encontro codigo, tiene que seguir agregando chars. Y si encontro, el proximo bit arranca uno nuevo
 				{
 					cadenaABuscar += bMasc.charAt(x); 
-					System.out.println(cadenaABuscar);
 					resultado = this.buscaPorHuffman(simbolosDecode, cadenaABuscar);
 					if(resultado != null)
 					{
+						this.escribeDecode(resultado);
 						cadenaABuscar = "";
 					}
 				}	
 				
-			bytes=(byte) (fout.read() & 0xFF);
-			//	bytes = (fout.read() & 0xFF);
-			
-			if(bytes == -1)
-				bytes =(byte) 255;
-			System.out.println(bytes& 0xFF);
 			}
-			System.out.println(bytes & 0xFF);
-						
+
+			//this.closeDecode();
+			//fout.close();
 			
 			}catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -513,14 +462,41 @@ public class Huffman {
 				e2.printStackTrace();
 			}
 		
-		
-
-		
-		
-		//this.createTabla();
-		
 	}
 
+	
+	
+	public void creaDecode()
+	{
+		
+		try {
+			this.decodeArchHuffman = new File("Resultadostp1g8Decode2.txt");
+			this.w2Decode = new FileWriter(this.decodeArchHuffman);
+			this.bw2Decode =  new BufferedWriter(this.w2Decode);
+			this.pwDecode = new PrintWriter(this.bw2Decode);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void escribeDecode(String res) {
+		
+		this.pwDecode.write(res);
+			
+	}
+	
+	public void closeDecode() {
+		try {
+			this.w2Decode.close();
+			//this.bw2Decode.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	public String buscaPorHuffman(List<Simbolo> simbolosDecode, String cadenaABuscar) {
 		
 		int size = simbolosDecode.size();
@@ -533,7 +509,6 @@ public class Huffman {
 			{
 				ok = true;
 				resp = simbolosDecode.get(i).getSimbolo();
-				System.out.print(resp);
 			}
 			i++;
 		}

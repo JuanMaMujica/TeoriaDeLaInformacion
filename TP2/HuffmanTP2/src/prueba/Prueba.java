@@ -27,9 +27,7 @@ public class Prueba {
 	
 		comprimirArchivo_2(1);
 		System.out.println("----------------------------------------------------------------------------------------------------------------------------");
-		//comprimirArchivo_2(2);
 		System.out.println("----------------------------------------------------------------------------------------------------------------------------");
-		//comprimirArchivo_2(3);
 	}
 
 	public static void comprimirArchivo_2(int arch) throws IOException {
@@ -51,16 +49,6 @@ public class Prueba {
 			fr = new FileReader("tp1_grupo8.txt");
 			br = new BufferedReader(fr);
 			escribir = new Escritura(arch);
-		}else if (arch==2) {
-			fr = new FileReader("Chino.txt");
-			br = new BufferedReader(fr);
-			escribir = new Escritura(arch);
-		}else {
-			fr = new FileReader("imagen.raw");
-			br = new BufferedReader(fr);
-			escribir = new Escritura(arch);
-			br.readLine();
-			br.readLine();
 		}
 		
 		
@@ -94,7 +82,7 @@ public class Prueba {
 				else 
 				{
 					if(auxFile!=10) 
-					{  // PARA LA IMAGEN SE OMITE LOS ENTER O \N (NUEVA LINEA)
+					{  
 						cont++;
 						auxChar = (char) auxFile;
 						aux = String.valueOf(auxChar);
@@ -130,16 +118,10 @@ public class Prueba {
 	
 		Collections.sort(simbolos); //oRDENA POR SIMBOLO Y PROB!
 		
-		//System.out.println("SIMBOLOS");
-
-		//System.out.println(simbolos.get(0));
-		
-		//System.out.println("SIMBOLOS");
 
 		listaArbol = l.generaLista(simbolos);
 		h.getHuffman(listaArbol.getArbol(), "", simbolos);
 		for (int i = 0; i < simbolos.size(); i++) {
-			//System.out.println(simbolos.get(i).toString());
 			escribir.agregaResultado(simbolos.get(i).toString()); // AQUI SE ESCRIBEN EN LOS ARCHIVOS DE RESULTADOS LA CODIFICACION EN HUFFMAN ADEMÃ�S DE OTROS DATOS
 		} 
 		h.auxCompresionHuffman(listaArbol, arch, escribir, simbolos); //Comprime tabla y archivo en si, en el primer archivo
