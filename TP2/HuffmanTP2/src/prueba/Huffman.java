@@ -164,9 +164,7 @@ public class Huffman {
 			//PARA EL CHAR EN ASCII
 			
 			String cantidadDeSimbolosASCIBin = Integer.toBinaryString((int)simbolos.get(i).getSimbolo().charAt(0));
-			/*System.out.println("SIMBOLO " + simbolos.get(i).getSimbolo());
-			System.out.println((int)simbolos.get(i).getSimbolo().charAt(0));
-			*/
+			
 			int agregoascii = (8 - cantidadDeSimbolosASCIBin.length());
 			String strascii = "";
 			if (agregoascii > 0)
@@ -227,13 +225,11 @@ public class Huffman {
 					
 			}
 
+
 			codHuffman = strBits + codHuffman; //Longitud de 1 byte
-			//System.out.println(codHuffman);
 			escribir.agregaLinea(codHuffman);
-			//escribir.agregaLinea(auxLetra);
 			
 			
-			//System.out.println("SIMBOLO: " + simbolos.get(i).getSimbolo().charAt(0) + "  " + (int)simbolos.get(i).getSimbolo().charAt(0) + " : " + cantidadDeSimbolosASCIBin + " " + logitudCodigoHuffmanBin + " " + codHuffman);
 			
 			i++;
 		}
@@ -420,43 +416,7 @@ public class Huffman {
 	}
 
 	
-	public void comprimeTableNoBin(int arch, FileReader fr, List<Simbolo> simbolos) {
-		
-		for (int i = 0; i < simbolos.size(); i++) {
-			//System.out.println(simbolos.get(i).getSimbolo());
-			//escribir.agregaResultado(simbolos.get(i).toString()); // AQUI SE ESCRIBEN EN LOS ARCHIVOS DE RESULTADOS LA CODIFICACION EN HUFFMAN ADEMÃ�S DE OTROS DATOS
-		} 
-		
-		
-		/*while ((auxFile = br.read()) != -1) {
-			if (auxFile != 13) { // SE OMITE EL DENOMINADO RETORNO DE CARRO YA QUE NO ES NECESARIO
-				if (arch != 3) {
-					if (auxFile != 10) { // hay que asignarle la cadena "enter" ya que en la colección el simbolo esta seteado de esa forma
-						char auxChar = (char) auxFile;
-						auxLetra = String.valueOf(auxChar);
-					} else 
-						auxLetra = "enter";
-					this.buscaSimbolo(listaArbol.getArbol(),auxLetra,auxNodo);
-					escribir.agregaLinea(auxNodo.getCodigoBinario());
-					auxNodo.setCodigoBinario("");
-				} else { 
-					if (auxFile != 10) {  // PARA LA IMAGEN SE OMITE LOS ENTER O \N
-						char auxChar = (char) auxFile;
-						auxLetra = String.valueOf(auxChar);
-						this.buscaSimbolo(listaArbol.getArbol(),auxLetra,auxNodo);
-						escribir.agregaLinea(auxNodo.getCodigoBinario());
-						auxNodo.setCodigoBinario("");
-					}
-				}
-			}
-		}
-		fr.close();
-		br.close();
-		escribir.cierraArchivo1();
-	*/		
-	}
-	
-	public void decodeHuffman() {
+	public void decodeHuffman(List<Simbolo> simbolosDecode) {
 		
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -464,34 +424,86 @@ public class Huffman {
 		int longitudTabla;
 		int i = 0;
 		try {
-			//fr = new FileReader("tp1_grupo8Huffman.huf");
+			
+			//PRIMERO ARMAMOS LA TABLA Y LA DECODIFICAMOS
 			FileInputStream fout = new FileInputStream("tp1_grupo8Huffman.huf");
-			//br = new BufferedReader(fr);
 			longitudTabla = (int)(bytes=(byte) fout.read()); //El primer elemento que lea que sea la long de la tabla
-			while((bytes=(byte) fout.read())!=-1 && i < longitudTabla) 
+			System.out.println("------------------------------------------------------------");
+			int rec = 1;
+			while(i < longitudTabla && (bytes=(byte) fout.read())!=-1)  //ojo q aca tendria q hacer la mascara tambien eh
 			{
-						
-				System.out.println((bytes & 0xFF));
+				rec++;
 				char simbolo = (char) (bytes & 0xFF);
-				System.out.println("SIMBOLO: " + simbolo);
+				
+				simbolosDecode.add(new Simbolo(String.valueOf(simbolo),longitudTabla,0)); //La frecuencia ahora para decodificar no me sirve pq es para armar la tabla, entonces la ignoro
 				int longCodHuffman = ((byte)fout.read() & 0xFF);
-				System.out.println("LONGITUD HUFFMAN: " + longCodHuffman);
-				int bytesRecorrer = (int) Math.ceil((double)(longCodHuffman/8));
-				System.out.println("BYTES A RECORRER: " + bytesRecorrer);
+				rec++;
+				int bytesRecorrer = (int) Math.ceil((double)longCodHuffman/8);
+				String bMasc = "";
 				for(int j=0;j<bytesRecorrer;j++)
 				{
-					byte b = (byte) fout.read();
+					String ag="";
+					byte b = (byte) (fout.read() & 0xFF);
+					rec++;
+					int l = Integer.toBinaryString((int)(b & 0xFF)).length(); //longitud del binario, tiene que ser 8... y cuando lo rearmo con los dos bytes se complica
+					if(j==1) //medio harcodeado para la segunda vuelta pq cuando lee me saca los ceros del pcipio
+						for(int z=0; z < 8-l; z++)
+						{
+							ag +="0";
+						}
+							
+					bMasc +=  ag + Integer.toBinaryString((int)(b & 0xFF));
 				}
-				System.out.println(i);
-				i++;
-						
-				/*binario+=String.valueOf(bytes-48); // ya que el valor que voy a recibir es o un 1 o un 0, entonces resto por 48 por valor de tabla ASCII
-				if(binario.length()==8) {
-					wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
-					binario=""; // reinicio la cadena 
-					out.write(wrByte); //escribo en el archivo
-				}*/
+				
+				String agrego = "";
+				for(int z=0; z < (longCodHuffman - bMasc.length()); z++)//Los ceros q le tengo q meter adelante para reconstruirlo bien
+					agrego+="0";
+					
+				simbolosDecode.get(i).setCodigoHuffman(agrego + bMasc);
+			
+				
+				i++;		
+				
 			}
+			
+			//CON LA TABLA YA ARMADA, PASAMOS A DECODIFICAR EL ARCHIVO
+			String cadenaABuscar = "";
+			int recorre = fout.read() & 0xFF;
+
+			bytes=(byte) (fout.read() & 0xFF);
+			while(bytes!=-1) // Recorremos el resto del arch desde donde se quedo parado
+			{
+				rec++;
+				String bMasc =  Integer.toBinaryString(bytes & 0xFF);
+				String a = "";
+				for (int b=0; b < 8 - bMasc.length(); b++)
+				{
+					a+="0";
+				}
+				bMasc = a + bMasc;
+				String resultado = null;
+
+
+				for(int x=0;x<bMasc.length();x++) //Al ser instantaneos, automaticamente si no encontro codigo, tiene que seguir agregando chars. Y si encontro, el proximo bit arranca uno nuevo
+				{
+					cadenaABuscar += bMasc.charAt(x); 
+					System.out.println(cadenaABuscar);
+					resultado = this.buscaPorHuffman(simbolosDecode, cadenaABuscar);
+					if(resultado != null)
+					{
+						cadenaABuscar = "";
+					}
+				}	
+				
+			bytes=(byte) (fout.read() & 0xFF);
+			//	bytes = (fout.read() & 0xFF);
+			
+			if(bytes == -1)
+				bytes =(byte) 255;
+			System.out.println(bytes& 0xFF);
+			}
+			System.out.println(bytes & 0xFF);
+						
 			
 			}catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -502,9 +514,32 @@ public class Huffman {
 			}
 		
 		
+
+		
+		
 		//this.createTabla();
 		
 	}
 
+	public String buscaPorHuffman(List<Simbolo> simbolosDecode, String cadenaABuscar) {
+		
+		int size = simbolosDecode.size();
+		int i=0;
+		String resp=null;
+		boolean ok = false;
+		while(i<size && !ok)
+		{
+			if(simbolosDecode.get(i).getCodigoHuffman().equals(cadenaABuscar))
+			{
+				ok = true;
+				resp = simbolosDecode.get(i).getSimbolo();
+				System.out.print(resp);
+			}
+			i++;
+		}
+		
+		return resp;
+		
+	}
 	
 }

@@ -83,7 +83,7 @@ public class Prueba {
 						}
 						else  //Caracteres tiene los caracteres distintos
 						{
-							//System.out.println(aux);
+							//System.out.println("CARACTER: " + aux);
 							//System.out.println((int)auxFile);
 							caracteres.add(aux);    //Si no, lo agrego y le creo una frecuencia
 							frecuencia.add(new Frecuencia());
@@ -159,8 +159,8 @@ public class Prueba {
 		h.getTasaCompresion((h.getTamArchivo(arch)-contRetorno-contEnters-6),(h.getTamComprimido(arch)) ,escribir);
 		// PARA LAS IMAGENES HAY QUE RESTAR LOS ENTERS O \N QUE VAN ACOMPANADOS DE LOS RETORNO DE CARRO, LOS 6 QUE TAMBIEN SE RESTAN CORRESPONDEN A LOS PRIMERO 6 BYTES QUE NO SE UTILIZAN DE LA IMAGEN, OBTENIENDO ASI EL TAMANO REAL UTILIZADO DE ELLA
 	
-			
-		h.decodeHuffman();
+		List<Simbolo> simbolosDecode = new ArrayList<Simbolo>();	
+		h.decodeHuffman(simbolosDecode);
 	}
 
 

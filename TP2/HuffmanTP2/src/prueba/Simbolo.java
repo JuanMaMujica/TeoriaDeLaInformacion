@@ -52,5 +52,5 @@ public class Simbolo implements Comparable<Simbolo> {
 	public void setCodigoHuffman(String codigoHuffman) {
 		this.codigoHuffman = codigoHuffman;
 	}
-
+	
 }
