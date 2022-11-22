@@ -16,10 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-/**CLASE EN DONDE SE VAN A EJECUTAR LOS METODOS PRINCIPALES PARA HUFFMAN
- * @author usuario
- *
- */
+//CLASE DEL HUFFMAN, TIENE TODOS LOS METODOS DE CODIFICACION, ARMAR EL ARBOL, COMPRIMIR Y DESCOMPRIMIR ARCH Y TABLA!
 public class Huffman {
 
 	private ArrayList<NodoArbol> auxLongitudes = new ArrayList();
@@ -27,12 +24,14 @@ public class Huffman {
 	private FileWriter w2Decode;
 	private BufferedWriter bw2Decode;
 	private PrintWriter pwDecode;
+	
+	private File decodeArchHuffman2;
+	private FileWriter w2Decode2;
+	private BufferedWriter bw2Decode2;
+	private PrintWriter pwDecode2;
+	private int i = 0;
 
-	/** ACA SE CODIFICA A LOS SIMBOLOS
-	 * @param arbol
-	 * @param binario
-	 * @param simbolos
-	 */
+	//Codifico los simbolos
 	public void getHuffman(NodoArbol arbol, String binario, List<Simbolo> simbolos) {
 		String auxBinario = "";
 		if (arbol != null) {
@@ -53,11 +52,7 @@ public class Huffman {
 
 	}
 
-	/**METODO QUE UTILIZA UNA COLECCION AUXILIAR PARA PODER IMPRIMIR EN ARCHIVOS Y/O PANTALLA LAS CODIFICACIONES DE HUFFMAN Y DE SHANNON FANO EN EL MISMO ORDEN INDEPENDIENTEMENTE DE SU CODIFICACION
-	 * @param simbolo
-	 * @param codHuffman
-	 * @param simbolos COLECCION DE SIMBOLOS
-	 */
+	//Para poder imprimir en orden los codigos
 	public void asignaCodigo(String simbolo, String codHuffman, List<Simbolo> simbolos) {
 		int i = 0;
 		while (i < simbolos.size() && !simbolo.equals(simbolos.get(i).getSimbolo()))
@@ -65,9 +60,7 @@ public class Huffman {
 		simbolos.get(i).setCodigoHuffman(codHuffman);
 	}
 
-	/**METODO EN DONDE SE ALMACENAN LAS LONGITUDES DE LOS CODIGOS EN HUFFMAN PARA FACILITAR LOS CALCULOS DE LONGITUD MEDIA
-	 * @param arbol
-	 */
+	
 	public void addLongitud(NodoArbol arbol) {
 		this.auxLongitudes.add(arbol);
 	}
@@ -111,12 +104,8 @@ public class Huffman {
 	}
 
 	
-	/** ACA SE REALIZA LA CODIFICACION POR HUFFMAN A UN .Huf
-	 * @param listaArbol
-	 * @param arch
-	 * @param escribir
-	 * @throws IOException
-	 */
+	
+	//COMPRESION AUXILIAR -> SE TRADUCE EL TXT A UN HUFF CON CHARS 1 Y 0 (SIN COMPRIMIR AUN)
 	public void auxCompresionHuffman(NodoLista listaArbol, int arch, Escritura escribir, List<Simbolo> simbolos) throws IOException {
 		String auxLetra;
 		NodoArbol auxNodo = new NodoArbol(); // nodo auxiliar en el cual se ira asignando los codigos huffman para escribir en archivo
@@ -145,25 +134,19 @@ public class Huffman {
 		}	
 		else if(agrego < 0)
 		{
-			//Nunca va a ser mayor que 8, reservi siemppre 1 byte
+			//Nunca va a ser mayor que 8, reservo siemppre 1 byte
 		}
 		cantidadDeSimbolosBin = str + cantidadDeSimbolosBin; //Longitud de 1 byte
 			
 		escribir.agregaLinea(cantidadDeSimbolosBin);
 		
-		
-		
-		
 		int i=0;
 		while(i<simbolos.size()) {
-			
-			
-			//LA DUDA ES: EL CHAR BACKSTIP Y LA ONDA ME TIRAN VALORES DE ASCII ALTISIMOS PERO EN LA TABLA POSTA NO TIOENEN ESOS VALORES. Es un error?
-			
-			
-			//PARA EL CHAR EN ASCII
-			
-			String cantidadDeSimbolosASCIBin = Integer.toBinaryString((int)simbolos.get(i).getSimbolo().charAt(0));
+			String cantidadDeSimbolosASCIBin="";
+			if(simbolos.get(i).getSimbolo().equals("enter"))
+				cantidadDeSimbolosASCIBin = Integer.toBinaryString(10);
+			else
+				cantidadDeSimbolosASCIBin = Integer.toBinaryString((int)simbolos.get(i).getSimbolo().charAt(0));
 			
 			int agregoascii = (8 - cantidadDeSimbolosASCIBin.length());
 			String strascii = "";
@@ -176,7 +159,7 @@ public class Huffman {
 			}
 			else if(agregoascii < 0)
 			{
-				//nunca va a oasar
+				//nunca va a pasar
 			}
 			
 			
@@ -225,11 +208,8 @@ public class Huffman {
 					
 			}
 
-
 			codHuffman = strBits + codHuffman; //Longitud de 1 byte
 			escribir.agregaLinea(codHuffman);
-			
-			
 			
 			i++;
 		}
@@ -237,16 +217,15 @@ public class Huffman {
 		double tamañoArch = this.getTamArchivo(1);
 		int recorrer = 0;
 		while(recorrer < tamañoArch)
-		 {
+		{
 			recorrer++;
-			System.out.println(recorrer);
+			//System.out.println(recorrer);
 			auxFile = (br.read() & 0xFF);
 			if (auxFile != 13) { // OMITE RETORNO DE CARRO 
 				if (arch != 3) {
-					if (auxFile != 10) { 
-						
-						
+					if (auxFile != 10) { 						
 						char auxChar = (char) auxFile;
+						//System.out.println(auxChar);
 						auxLetra = String.valueOf(auxChar);
 					} else 
 						auxLetra = "enter";
@@ -269,6 +248,7 @@ public class Huffman {
 				}
 			}
 		}
+
 		fr.close();
 		br.close();
 		escribir.cierraArchivo1();
@@ -276,10 +256,7 @@ public class Huffman {
 
 	}
 	
-	/**METODO DONDE SE REALIZA LA COMPRESION REAL DE HUFFMAN
-	 * @param arch
-	 * @throws IOException
-	 */
+//	COMPRESION POR HUFFMAN. ACA GENERAMOS EL ARCH COMPRIMIDO
 	public void compresionHuffman(int arch) throws IOException {
 		String binario="";
 		byte bytes,wrByte;
@@ -293,7 +270,9 @@ public class Huffman {
 				bytes=(byte) (in.read() & 0xFF);
 				r++;
 				binario+=String.valueOf(bytes-48); // ya que el valor que voy a recibir es o un 1 o un 0, entonces resto por 48 por valor de tabla ASCII
+				//System.out.println((char)bytes);
 				if(binario.length()==8) {
+					//System.out.println(binario);
 					wrByte=this.pasajeByte(binario); // paso el byte en string a byte real
 					binario=""; // reinicio la cadena 
 					out.write(wrByte); //escribo en el archivo
@@ -311,10 +290,8 @@ public class Huffman {
 		} 
 	}
 	
-	/**TRATAR LA CODIFICACION COMO BYTE EN EL ARCHIVO .FAN
-	 * @param binario
-	 * @return
-	 */
+	
+	//PASAJE A BYTE PARA LA COMRPESION
 	public byte pasajeByte(String binario) {
 		byte bin=0;
 		int contador=(binario.length()-1);
@@ -326,11 +303,7 @@ public class Huffman {
         return bin;
 	}
 	
-	/**METODO PARA BUSCAR UN SIMBOLO Y ASI RETORNAR SU CODIGO HUFFMAN PARA ESCRIBIR EN EL ARCHIVO A COMPRIMIR
-	 * @param arbol
-	 * @param caracter
-	 * @param auxNodo
-	 */
+	//BUSQUEDA DE UN SIMBOLO POR EL ARBOL
 	public void buscaSimbolo(NodoArbol arbol, String caracter, NodoArbol auxNodo) {
 		if (arbol != null) {
 			this.buscaSimbolo(arbol.getIzq(), caracter, auxNodo);
@@ -340,11 +313,9 @@ public class Huffman {
 		}
 	}
 
-	/**
-	 * @param arch
-	 * @return retorna el tamano del archivo original
-	 * @throws IOException
-	 */
+
+	
+	//RETORNA EL TAMAÑO PARA RECORRER LOS ARCHIVOS
 	public double getTamArchivo(int arch) throws IOException {
 		Path ruta;
 		if (arch == 1) {
@@ -368,11 +339,7 @@ public class Huffman {
 	}
 	
 	
-	/** HACE LA DECODIFICACION
-	 * @param arch
-	 * @return retorna el tamano del archivo original
-	 * @throws IOException
-	 */
+	//ACA DESCOMPRIME PRIMERO LA TABLA Y LUEGO EL RESTO DEL ARCHIVO
 	public void decodeHuffman(List<Simbolo> simbolosDecode) {
 		
 		FileReader fr = null;
@@ -383,7 +350,7 @@ public class Huffman {
 		try {
 			
 			//PRIMERO ARMAMOS LA TABLA Y LA DECODIFICAMOS
-			FileInputStream fout = new FileInputStream("tp1_grupo8Huffman.huf");
+			FileInputStream fout = new FileInputStream("tp1_grupo8Huffman.Huf");
 			longitudTabla = (int)(bytes=(byte) fout.read()); //El primer elemento que lea que sea la long de la tabla
 			System.out.println("------------------------------------------------------------");
 			int rec = 1;
@@ -392,7 +359,10 @@ public class Huffman {
 				rec++;
 				char simbolo = (char) (bytes & 0xFF);
 				
-				simbolosDecode.add(new Simbolo(String.valueOf(simbolo),longitudTabla,0)); //La frecuencia ahora para decodificar no me sirve pq es para armar la tabla, entonces la ignoro
+				if((int)simbolo == 10)
+					simbolosDecode.add(new Simbolo("enter",longitudTabla,0)); //La frecuencia ahora para decodificar no me sirve pq es para armar la tabla, entonces la ignoro
+				else
+					simbolosDecode.add(new Simbolo(String.valueOf(simbolo),longitudTabla,0)); //La frecuencia ahora para decodificar no me sirve pq es para armar la tabla, entonces la ignoro
 				int longCodHuffman = ((byte)fout.read() & 0xFF);
 				rec++;
 				int bytesRecorrer = (int) Math.ceil((double)longCodHuffman/8);
@@ -444,13 +414,17 @@ public class Huffman {
 					resultado = this.buscaPorHuffman(simbolosDecode, cadenaABuscar);
 					if(resultado != null)
 					{
-						this.escribeDecode(resultado);
+						if(resultado.equals("enter"))
+							this.escribeDecode("\n");
+						else
+							this.escribeDecode(resultado);
 						cadenaABuscar = "";
 					}
 				}	
 				
 			}
 
+			//this.escribeDecode("FRANCO");
 			//this.closeDecode();
 			//fout.close();
 			
@@ -462,6 +436,7 @@ public class Huffman {
 				e2.printStackTrace();
 			}
 		
+		
 	}
 
 	
@@ -470,10 +445,12 @@ public class Huffman {
 	{
 		
 		try {
-			this.decodeArchHuffman = new File("Resultadostp1g8Decode2.txt");
+			this.decodeArchHuffman = new File("Resultadostp1g8Decode.txt");
+		
 			this.w2Decode = new FileWriter(this.decodeArchHuffman);
 			this.bw2Decode =  new BufferedWriter(this.w2Decode);
 			this.pwDecode = new PrintWriter(this.bw2Decode);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -483,6 +460,8 @@ public class Huffman {
 	
 	public void escribeDecode(String res) {
 		
+
+		this.pwDecode.flush();
 		this.pwDecode.write(res);
 			
 	}

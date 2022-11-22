@@ -1,10 +1,7 @@
 package prueba;
 
 
-/** CLASE NODO DE LISTA YA QUE SE VA A TRASPASAR LO HECHO EN EL TP1 A JAVA, CON EL USO DE LISTAS Y ARBOLES TAL CUAL IMPLEMENTADO EN C
- * @author usuario
- *
- */
+
 public class NodoLista {
 	
 	private String simbolo;

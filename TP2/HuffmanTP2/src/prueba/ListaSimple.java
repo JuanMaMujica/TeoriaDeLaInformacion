@@ -2,14 +2,7 @@ package prueba;
 
 import java.util.List;
 
-/** EN ESTA CLASE SE VA A GENERAR UNA LISTA SIMPLE Y A SU VEZ EL ARBOL DE HUFFMAN, ESTE ARBOL VA A ESTAR ALMACENADO EN UN NODO DE LISTA SIMPLE
- * @author usuario
- *
- */
-/**
- * @author usuario
- *
- */
+
 public class ListaSimple {
 	
 	private NodoLista cabecera;
@@ -57,11 +50,6 @@ public class ListaSimple {
 	}
 	
 	
-	/**METODO PARA FUSIONAR LOS NODOS DE LISTA QUE TIENEN LA MENOR PROBABILIDAD EN TAL MOMENTO
-	 * @param ant
-	 * @param act
-	 * @return
-	 */
 	public NodoArbol fusionNodo(NodoLista ant,NodoLista act) {
 		NodoArbol aux = new NodoArbol();
 		aux.setSimbolo(ant.getSimbolo()+act.getSimbolo());

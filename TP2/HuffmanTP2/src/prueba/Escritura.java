@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+
+
+
 public class Escritura {
 	private File f;
 	private File f2;

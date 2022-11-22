@@ -1,9 +1,6 @@
 package prueba;
 
-/** CLASE NODOARBOL YA QUE SE VA A TRASPASAR LO HECHO EN EL TP1 A JAVA, CON EL USO DE LISTAS Y ARBOLES TAL CUAL IMPLEMENTADO EN C
- * @author usuario
- *
- */
+
 public class NodoArbol {
 	private String codigoBinario,simbolo;
 	double prob;

@@ -12,24 +12,15 @@ import java.util.Scanner;
 
 public class Prueba {
 
-	/**
-	 * RECOMENDACIÃ“N, SI EL ENCODING POR DEFECTO NO ES UTF-8, APLICARLO PARA PODER
-	 * MOSTRAR TANTO LOS CARACTERES ESPECIALES EN ESPAÃ‘OL COMO LOS CARACTERES EN
-	 * CHINO WINDOW -> PREFERENCES -> GENERAL -> CONTENT TYPE -> PARARSE SOBRE TEXT
-	 * -> DEBAJO EN DEFAULT ENCODING TIPEAR UTF-8 -> APLICAR Y CERRAR OTRA OPCION:
-	 * ALT+ENTER Y DE APARECER OTRO TIPO DE ENCODING, PINCHAR EN OTHER Y SELECCIONAR
-	 * UTF-8
-	 * 
-	 * @param args
-	 * @throws IOException
-	 */
+
 	public static void main(String[] args) throws IOException {
 	
 		comprimirArchivo_2(1);
 		System.out.println("----------------------------------------------------------------------------------------------------------------------------");
-		System.out.println("----------------------------------------------------------------------------------------------------------------------------");
 	}
 
+	
+	
 	public static void comprimirArchivo_2(int arch) throws IOException {
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -60,6 +51,7 @@ public class Prueba {
 				{
 					
 					auxChar = (char) auxFile;
+					//System.out.println(auxChar);
 					aux = String.valueOf(auxChar); //Valor del char que estoy leyendo
 					if((int)auxFile != 771 && (int)auxFile != 769 && (int)auxFile != 776 ) //lo puedo reemp por que no sea < a 255 pero dfesp veo
 					{
@@ -71,8 +63,6 @@ public class Prueba {
 						}
 						else  //Caracteres tiene los caracteres distintos
 						{
-							//System.out.println("CARACTER: " + aux);
-							//System.out.println((int)auxFile);
 							caracteres.add(aux);    //Si no, lo agrego y le creo una frecuencia
 							frecuencia.add(new Frecuencia());
 						}	
@@ -98,11 +88,11 @@ public class Prueba {
 							frecuencia.add(new Frecuencia());
 						}
 					}
-					else contEnters++; // MAS ADELANTE SE EXPLICA SU USO
+					else contEnters++; 
 				}
 			}
 			else
-				contRetorno++; // MAS ADELANTE SE EXPLICA SU USO
+				contRetorno++; 
 		}
 
 		for (int i = 0; i < caracteres.size(); i++) {
@@ -138,11 +128,10 @@ public class Prueba {
 		if(arch!=3)
 			h.getTasaCompresion(h.getTamArchivo(arch),h.getTamComprimido(arch),escribir); 
 		else
-		h.getTasaCompresion((h.getTamArchivo(arch)-contRetorno-contEnters-6),(h.getTamComprimido(arch)) ,escribir);
-		// PARA LAS IMAGENES HAY QUE RESTAR LOS ENTERS O \N QUE VAN ACOMPANADOS DE LOS RETORNO DE CARRO, LOS 6 QUE TAMBIEN SE RESTAN CORRESPONDEN A LOS PRIMERO 6 BYTES QUE NO SE UTILIZAN DE LA IMAGEN, OBTENIENDO ASI EL TAMANO REAL UTILIZADO DE ELLA
+			h.getTasaCompresion((h.getTamArchivo(arch)-contRetorno-contEnters-6),(h.getTamComprimido(arch)) ,escribir);
 	
 		List<Simbolo> simbolosDecode = new ArrayList<Simbolo>();	
-		h.decodeHuffman(simbolosDecode);
+		h.decodeHuffman(simbolosDecode); //DECODIFICACION!
 	}
 
 
